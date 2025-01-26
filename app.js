@@ -9,10 +9,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://5c-tau.vercel.app/",
       "https://5c-tau.vercel.app",
-      "https://5c-back.vercel.app/",
-      "https://5c-back.vercel.app",
     ],
     credentials: true,
     optionSuccessStatus: 200,
