@@ -7,7 +7,7 @@ const compression = require("compression");
 const app = express();
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://c5.damansolutions.com"],
+    origin: ["http://localhost:5173", "https://5c-tau.vercel.app/"],
     credentials: true,
     optionSuccessStatus: 200,
   })
