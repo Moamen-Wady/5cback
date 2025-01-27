@@ -16,7 +16,6 @@ router.get("/reservations", async (req, res) => {
 router.post("/reservations/", async (req, res) => {
   try {
     const { userName, phoneNum1, year, sid } = req.body;
-
     const existingReservation = await Resv.findOne({ sid, year });
     if (existingReservation) {
       return res.send({
@@ -53,7 +52,7 @@ router.post("/reservations/", async (req, res) => {
       if (result) return;
     }
     let sidhash =
-      Math.ceil((Number(phoneNum1) * 1787) / 131) +
+      Math.ceil((Number(phoneNum1.slice(-6,-2)) * 1787) / 131) +
       userName.toString().slice(-1) +
       userName.toString().slice(1, 2);
     let thisResv = new Resv({
