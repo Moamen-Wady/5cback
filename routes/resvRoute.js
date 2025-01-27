@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const Resv = require("../models/resvSchema");
-const Idx = require("../models/idxSchema");
-const IdxOthers = require("../models/idxOthersSchema");
 router.route("/reservations");
 
 router.get("/reservations", async (req, res) => {
@@ -16,125 +14,65 @@ router.get("/reservations", async (req, res) => {
 });
 
 router.post("/reservations/", async (req, res) => {
-  let userName = req.body.userName;
-  let phoneNum1 = req.body.phoneNum1;
-  let year = req.body.year;
-  let sid = req.body.sid;
-  let idxs = await Idx.find().catch(() => {
-    res.send({ sts: "err", message: "Network Error, Please Try Again" });
-    return;
-  });
-  let idxos = await IdxOthers.find().catch(() => {
-    res.send({ sts: "err", message: "Network Error, Please Try Again" });
-    return;
-  });
+  try {
+    const { userName, phoneNum1, year, sid } = req.body;
 
-  let match = false;
+    const existingReservation = await Resv.findOne({ sid, year });
+    if (existingReservation) {
+      return res.send({
+        sts: "err",
+        message: "You Have Already Registered A Seat",
+      });
+    }
 
-  switch (year) {
-    case "intern":
-      if (idxs.length >= 300) {
-        res.send({
+    async function checkInternSeats() {
+      const count = await Resv.countDocuments({ year: "intern" });
+      if (count >= 350) {
+        return res.send({
           sts: "err",
           message: "We Are Sorry, All Seats Have Been Reserved",
         });
-        return;
-      } else {
-        await Idx.find({ idx: sid })
-          .then(async (u) => {
-            if (u.length > 0) {
-              res.send({
-                sts: "err",
-                message: "You Have Already Registered A Seat",
-              });
-              return;
-            } else {
-              let sidhash =
-                Math.ceil((Number(sid) * 1787) / 131) +
-                userName.toString().substr(-1);
-              let thisResv = new Resv({
-                userName: userName,
-                phoneNum1: phoneNum1,
-                year: year,
-                sid: sid,
-                code: sidhash,
-              });
-              let idxNew = new Idx({
-                idx: sid,
-              });
-              await thisResv.save().then(async () => {
-                await idxNew.save().then(() => {
-                  res.send({ sts: "ok", code: sidhash });
-                });
-              });
-            }
-          })
-          .catch(() => {
-            res.send({
-              sts: "err",
-              message: "Network Error, Please Try Again",
-            });
-          });
       }
-      break;
-    default:
-      if (idxos.length >= 50) {
-        res.send({
+    }
+
+    async function checkOthersSeats() {
+      const count = await Resv.countDocuments({ year: { $ne: "intern" } });
+      if (count >= 50) {
+        return res.send({
           sts: "err",
           message: "We Are Sorry, All Seats Have Been Reserved",
         });
-        return;
-      } else {
-        await IdxOthers.find({ idxothers: sid })
-          .then(async (u) => {
-            if (u.length > 0) {
-              for (let y of u) {
-                if (y.year == year) {
-                  res.send({
-                    sts: "err",
-                    message: "You Have Already Registered A Seat",
-                  });
-                  match = true;
-                  break;
-                }
-              }
-            }
-            if (match == false) {
-              let sidhash =
-                Math.ceil((Number(sid) * 1787) / 131) +
-                userName.toString().substr(-1);
-              let thisResv = new Resv({
-                userName: userName,
-                phoneNum1: phoneNum1,
-                year: year,
-                sid: sid,
-                code: sidhash,
-              });
-              let idxOthersNew = new IdxOthers({
-                idxothers: sid,
-                year: year,
-              });
-              await thisResv.save().then(async () => {
-                await idxOthersNew.save().then(() => {
-                  res.send({ sts: "ok", code: sidhash });
-                });
-              });
-            }
-          })
-          .catch(() => {
-            res.send({
-              sts: "err",
-              message: "Network Error, Please Try Again",
-            });
-          });
       }
-      break;
+    }
+
+    if (year === "intern") {
+      const result = await checkInternSeats();
+      if (result) return;
+    } else {
+      const result = await checkOthersSeats();
+      if (result) return;
+    }
+    let sidhash =
+      Math.ceil((Number(phoneNum1) * 1787) / 131) +
+      userName.toString().slice(-1) +
+      userName.toString().slice(1, 2);
+    let thisResv = new Resv({
+      userName: userName,
+      phoneNum1: phoneNum1,
+      year: year,
+      sid: sid,
+      code: sidhash,
+    });
+    const done = await thisResv.save();
+    if (done) {
+      return res.send({ sts: "ok", code: sidhash });
+    }
+  } catch {
+    return res.send({
+      sts: "err",
+      message: "Network Error, Please Try Again",
+    });
   }
 });
-// router.delete( '/reservations/:id', async ( req, res ) => {
-//     const all = await Resv.find();
-//     const ths = all[ req.params.id ];
-//     await Resv.deleteOne( ths );
-//     res.send( 'ok' )
-// } );
+
 module.exports = router;
