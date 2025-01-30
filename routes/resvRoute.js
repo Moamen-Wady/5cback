@@ -3,7 +3,7 @@ const router = express.Router();
 const Resv = require("../models/resvSchema");
 router.route("/reservations");
 
-router.get("/reservations", async (req, res) => {
+router.get("/", async (req, res) => {
   await Resv.find()
     .then((resvs) => {
       res.send({ sts: "ok", resvs: resvs });
@@ -13,7 +13,7 @@ router.get("/reservations", async (req, res) => {
     });
 });
 
-router.post("/reservations/", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { userName, phoneNum1, year, sid } = req.body;
     const existingReservation = await Resv.findOne({ sid, year });

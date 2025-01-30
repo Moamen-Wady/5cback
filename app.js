@@ -19,7 +19,8 @@ app.use(express.json());
 app.use(helmet());
 app.use(compression());
 app.use(express.urlencoded({ extended: true }));
-app.use("/", require("./routes/resvRoute"));
+app.use("/reservations", require("./routes/resvRoute"));
+app.use("/admin", require("./routes/adminRoute"));
 app.listen(3005);
 mongoose
   .connect(

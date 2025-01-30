@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const resvSchema = new mongoose.Schema({
-  userName: String,
-  phoneNum1: String,
-  year: String,
-  sid: String,
-  code: String,
+  userName: { type: String, required: true },
+  phoneNum1: { type: String, required: true },
+  year: { type: String, required: true },
+  sid: { type: String, required: true },
+  code: { type: String, required: true },
 });
 
 const Resv = mongoose.model("Resv", resvSchema);
