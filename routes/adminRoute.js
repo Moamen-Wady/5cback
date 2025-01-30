@@ -14,7 +14,7 @@ router.post("/hat", async (req, res) => {
     const exists = await Admin.findOne({ email });
     console.log(exists);
     if (exists) {
-      let isMatch = matching(pw, exists.pw);
+      let isMatch = await matching(pw, exists.pw);
       if (isMatch) {
         return res.send({
           sts: "ok",
@@ -40,7 +40,6 @@ router.post("/7ot", async (req, res) => {
   try {
     const exists = await Admin.findOne({ email });
     if (!exists) {
-      console.log(pw);
       const hashedPassword = await bcrypt.hash(pw, 10);
       const newAdmin = new Admin({
         email: email,
