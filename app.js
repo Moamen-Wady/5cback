@@ -24,7 +24,7 @@ app.use("/admin", require("./routes/adminRoute"));
 app.listen(3005);
 mongoose
   .connect(
-    `mongodb+srv://${process.env.MDBUSER}:${process.env.MDBPWD}@cluster0.iumas.mongodb.net/${process.env.MDBDB}`
+    `mongodb+srv://${process.env.MDBUSER}:${process.env.MDBPWD}@cluster0.iumas.mongodb.net/${process.env.MDBDB}?retryWrites=true&w=majority`
   )
   .then(() => {
     console.log("connected");
