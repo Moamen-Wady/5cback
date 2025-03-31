@@ -12,7 +12,6 @@ router.post("/hat", async (req, res) => {
   const { email, pw } = req.body;
   try {
     const exists = await Admin.findOne({ email });
-    console.log(exists);
     if (exists) {
       let isMatch = await matching(pw, exists.pw);
       if (isMatch) {
