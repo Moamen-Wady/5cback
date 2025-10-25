@@ -11,7 +11,7 @@ import AdminRouter from "./routes/adminRoute";
 const app: Application = express();
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://5c-tau.vercel.app"],
+    origin: ["http://localhost:5173", "https://5c-tau.vercel.app", "https://5c-ag0.pages.dev"],
     credentials: true,
     optionsSuccessStatus: 200,
   })
